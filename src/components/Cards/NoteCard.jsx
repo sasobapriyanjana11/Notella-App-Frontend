@@ -16,7 +16,7 @@ const NoteCard = ({ title, date, content, tags,isPinned,onEdit,onDelete, onPinNo
                 />
             </div>
             <p className="text-xs text-slate-600 mt-2">{content?.slice(0, 60)}</p>
-            <div className="">
+            <div className="flex justify-between items-center mt-3">
                 <div className="text-xs text-slate-500">{tags}</div>
                 <div className="flex items-center gap-2">
                     <MdCreate
