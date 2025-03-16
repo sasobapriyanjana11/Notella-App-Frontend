@@ -142,6 +142,9 @@ const Home = () => {
                 style={{
                     overlay: {
                         backgroundColor: "rgba(0,0,0,0.2)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                     },
                 }}
                 contentLabel="Edit Note"
