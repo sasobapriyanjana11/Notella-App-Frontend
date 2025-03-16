@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance.js";
 import moment from "moment";
 import Toast from "../../components/ToastMessage/Toast.jsx";
+import EmptyCard from "../../components/EmptyCard/EmptyCard.jsx";
+import AddNotesImg from "../../assets/images/add-notes.svg";
 
 const Home = () => {
 
@@ -69,7 +71,7 @@ const Home = () => {
         try {
             const response = await axiosInstance.get("/get-all-notes");
             if (response.data && response.data.notes) {
-                setAllNotes(response.data.notes); // Corrected to set all notes
+                setAllNotes(response.data.notes);
             }
         } catch (error) {
             console.log("An unexpected error occurred. Try again later.");
@@ -102,7 +104,8 @@ const Home = () => {
         <>
             <Navbar userInfo={userInfo} />
             <div className="container mx-auto">
-                <div className="grid grid-cols-3 gap-4 mt-8">
+                { allNotes.length> 0 ? (
+                        <div className="grid grid-cols-3 gap-4 mt-8">
                     {allNotes.map((item) => (
                         <NoteCard
                             key={item._id}
@@ -116,7 +119,11 @@ const Home = () => {
                             onPinNote={() => {}}
                         />
                     ))}
-                </div>
+                </div>): (
+                    <EmptyCard imgSrc={AddNotesImg}
+                               message={`Start to create your first note! Click the 'Add' button to jot down your
+                                        thoughts ,ideas,and reminders. Let's get started !`}/>
+                )}
             </div>
 
             <button
