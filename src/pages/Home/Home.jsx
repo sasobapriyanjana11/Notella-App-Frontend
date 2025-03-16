@@ -6,15 +6,18 @@ import AddEditNotes from "./AddEditNotes.jsx";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance.js";
+import moment from "moment";
 
 const Home = () => {
-
     const [openAddEditModal, setOpenAddEditModal] = useState({
         isShown: false,
         type: "add",
         data: null,
     });
+
+    const [allNotes, setAllNotes] = useState([]); // Corrected state for all notes
     const [userInfo, setUserInfo] = useState(null);
+
     const navigate = useNavigate();
 
     // Fetch user information
@@ -31,7 +34,20 @@ const Home = () => {
         }
     };
 
+    // Get all notes
+    const getAllNotes = async () => {
+        try {
+            const response = await axiosInstance.get("/get-all-notes");
+            if (response.data && response.data.notes) {
+                setAllNotes(response.data.notes); // Corrected to set all notes
+            }
+        } catch (error) {
+            console.log("An unexpected error occurred. Try again later.");
+        }
+    };
+
     useEffect(() => {
+        getAllNotes();
         getUserInfo();
     }, []); // Empty dependency array to only call once when the component mounts
 
@@ -40,16 +56,19 @@ const Home = () => {
             <Navbar userInfo={userInfo} />
             <div className="container mx-auto">
                 <div className="grid grid-cols-3 gap-4 mt-8">
-                    <NoteCard
-                        title="Meeting on 7th April"
-                        date="3rd April 2024"
-                        content="Meeting on 7th April 2024"
-                        tags="#Meeting"
-                        isPinned={true}
-                        onEdit={() => {}}
-                        onDelete={() => {}}
-                        onPinNote={() => {}}
-                    />
+                    {allNotes.map((item) => (
+                        <NoteCard
+                            key={item._id}
+                            title={item.title}
+                            date={item.createdOn}
+                            content={item.content}
+                            tags={item.tags}
+                            isPinned={item.isPinned}
+                            onEdit={() => setOpenAddEditModal({ isShown: true, type: "edit", data: item })}
+                            onDelete={() => {}}
+                            onPinNote={() => {}}
+                        />
+                    ))}
                 </div>
             </div>
 
@@ -65,6 +84,7 @@ const Home = () => {
             <Modal
                 isOpen={openAddEditModal.isShown}
                 onRequestClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
+                appElement={document.getElementById('root')} // Add this line to specify the root element
                 style={{
                     overlay: {
                         backgroundColor: "rgba(0,0,0,0.2)",
@@ -79,6 +99,7 @@ const Home = () => {
                     onClose={() => {
                         setOpenAddEditModal({ isShown: false, type: "add", data: null });
                     }}
+                    getAllNotes={getAllNotes}
                 />
             </Modal>
         </>
