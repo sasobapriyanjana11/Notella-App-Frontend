@@ -10,6 +10,7 @@ import moment from "moment";
 import Toast from "../../components/ToastMessage/Toast.jsx";
 import EmptyCard from "../../components/EmptyCard/EmptyCard.jsx";
 import AddNotesImg from "../../assets/images/add-notes.svg";
+import NoDataImg from "../../assets/images/no-data.svg";
 
 const Home = () => {
 
@@ -97,7 +98,7 @@ const Home = () => {
     }
 
     // search for a note ...
-    const onSearchNote=async(query)=>{
+    const onSearchNote = async (query)=>{
         try{
             const response=await axiosInstance.get("/search-notes",{
                     params:{query},
@@ -107,6 +108,22 @@ const Home = () => {
                 setAllNotes(response.data.notes);
             }
 
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    const updateIsPinned = async (noteData)=>{
+        const noteId=noteData._id;
+        try{
+            const response=await axiosInstance.put("/update-note-pinned/" + noteId,{
+                "isPinned": !noteId.isPinned,
+            });
+            if(response.data && response.data.note){
+                showToastMessage("Note Updated Successfully!");
+                getAllNotes();
+
+            }
         }catch(error){
             console.log(error);
         }
@@ -138,13 +155,19 @@ const Home = () => {
                             isPinned={item.isPinned}
                             onEdit={() =>handleEdit(item)}
                             onDelete={() => deleteNote(item)}
-                            onPinNote={() => {}}
+                            onPinNote={() => updateIsPinned(item)}
                         />
                     ))}
                 </div>): (
-                    <EmptyCard imgSrc={AddNotesImg}
-                               message={`Start to create your first note! Click the 'Add' button to jot down your
-                                        thoughts ,ideas,and reminders. Let's get started !`}/>
+                    <EmptyCard
+                        imgSrc={isSearch?NoDataImg:AddNotesImg}
+                               message={
+                                isSearch
+                                    ?`Oops ! No notes found matching your search`
+                                   :
+                                   `Start to create your first note! Click the 'Add' button to jot down your
+                                        thoughts ,ideas,and reminders. Let's get started !`
+                    }/>
                 )}
             </div>
 
